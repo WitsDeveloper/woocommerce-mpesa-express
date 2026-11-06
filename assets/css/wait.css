@@ -1,0 +1,29 @@
+/* WooCommerce Mpesa Express: order-received "check your phone" screen. */
+.wc-mpesa-wait {
+	border: 1px solid #d5dde3;
+	border-left: 4px solid #43b02a;
+	border-radius: 8px;
+	padding: 16px 20px;
+	margin: 0 0 24px;
+	background: #f6fbf4;
+}
+.wc-mpesa-wait__title { margin-top: 0; font-size: 1.25rem; }
+.wc-mpesa-wait__waiting { display: flex; gap: 12px; align-items: flex-start; }
+.wc-mpesa-wait__waiting p { margin: 0 0 6px; }
+.wc-mpesa-wait__hint { color: #52616c; font-size: .9em; }
+.wc-mpesa-wait__spinner {
+	flex: 0 0 22px; width: 22px; height: 22px; margin-top: 2px;
+	border: 3px solid #cfe8c7; border-top-color: #43b02a; border-radius: 50%;
+	animation: wc-mpesa-spin 1s linear infinite;
+}
+.wc-mpesa-wait[data-state="failed"] { border-left-color: #992020; background: #fcebeb; }
+.wc-mpesa-wait[data-state="timeout"] { border-left-color: #f8971b; background: #fff6ea; }
+.wc-mpesa-wait[data-state="failed"] .wc-mpesa-wait__waiting,
+.wc-mpesa-wait[data-state="timeout"] .wc-mpesa-wait__spinner { display: none; }
+.wc-mpesa-wait__message:empty { display: none; }
+.wc-mpesa-wait__message { font-weight: 600; }
+.wc-mpesa-wait__resend { min-height: 44px; }
+.wc-mpesa-wait__paybill { margin-top: 8px; }
+.wc-mpesa-wait__paybill summary { cursor: pointer; font-weight: 600; min-height: 32px; }
+@keyframes wc-mpesa-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .wc-mpesa-wait__spinner { animation: none; } }

@@ -6,7 +6,7 @@ Tested up to: 6.7
 Requires PHP: 7.4
 WC requires at least: 8.0
 WC tested up to: 9.4
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -113,6 +113,16 @@ Yes. Set **Exchange Rate to KES** in the gateway settings; the order total is mu
 Yes, set **Environment** to `Sandbox` and use your Daraja sandbox app credentials and test shortcode/MSISDN provided by Safaricom.
 
 == Changelog ==
+
+= 2.1.0 =
+* STK Push: account reference is a configurable prefix + order number (default RES1024); amount paid is checked against the order total; Safaricom 01xx numbers accepted.
+* Order-received "check your phone" screen: polls the order, reloads when paid, lets the customer resend the prompt (3 times, 30 s apart) and shows PayBill details as a fallback.
+* STK Query (stkpushquery) settles an order when Safaricom's callback is late or lost (rate-limited per order).
+* Callbacks are refused unless they come from Safaricom's callback ranges (196.201.212-214.x), in addition to the secret token; refused callbacks are logged whole.
+* Credentials can come from wp-config.php: WC_MPESA_CONSUMER_KEY, WC_MPESA_CONSUMER_SECRET, WC_MPESA_PASSKEY, WC_MPESA_SHORTCODE.
+* "Register URLs with Safaricom" is off unless WC_MPESA_ALLOW_REGISTER_URLS is true: on a PayBill shared with another system it would replace that system's C2B URLs.
+* The M-Pesa phone field now sits in the payment box (pre-filled from the billing phone) instead of the billing form.
+* Daraja access tokens are cached until they expire.
 
 = 2.0.0 =
 * Added M-Pesa PayBill (Manual / C2B) gateway with payment instructions and Confirmation/Validation IPN handling.

@@ -45,7 +45,7 @@ class WC_Gateway_Mpesa_C2B extends WC_Payment_Gateway {
 	public function is_available() {
 		if (!parent::is_available()) return false;
 
-		return trim((string) $this->get_option('business_shortcode')) !== '';
+		return $this->credential('business_shortcode') !== '';
 	}
 
 	public function init_form_fields() {
@@ -137,6 +137,13 @@ class WC_Gateway_Mpesa_C2B extends WC_Payment_Gateway {
 					"Your order will be confirmed automatically once payment is received.",
 			),
 
+			'restrict_callback_ips' => array(
+				'title'       => __('Only accept callbacks from Safaricom', 'woocommerce-mpesa-express'),
+				'type'        => 'checkbox',
+				'label'       => __('Refuse confirmations that do not come from Safaricom\'s callback addresses (196.201.212-214.x)', 'woocommerce-mpesa-express'),
+				'default'     => 'yes',
+			),
+
 			'urls' => array(
 				'title'       => __('Callback URLs', 'woocommerce-mpesa-express'),
 				'type'        => 'title',
@@ -146,8 +153,10 @@ class WC_Gateway_Mpesa_C2B extends WC_Payment_Gateway {
 					esc_html($this->secure_callback_url('wc_mpesa_c2b_confirmation')),
 					esc_html__('Validation URL (only called if Validation is enabled for your shortcode):', 'woocommerce-mpesa-express'),
 					esc_html($this->secure_callback_url('wc_mpesa_c2b_validation')),
-					'<a href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=wc_mpesa_c2b_register_urls'), 'wc_mpesa_c2b_register_urls')) . '" class="button button-secondary">' . esc_html__('Register URLs with Safaricom', 'woocommerce-mpesa-express') . '</a> ' .
-						esc_html__('(requires Consumer Key/Secret and shortcode above to be saved first). If registration fails, add the URLs manually in the Daraja portal.', 'woocommerce-mpesa-express')
+					WC_Mpesa_Express_Plugin::register_urls_allowed()
+						? '<a href="' . esc_url(wp_nonce_url(admin_url('admin-post.php?action=wc_mpesa_c2b_register_urls'), 'wc_mpesa_c2b_register_urls')) . '" class="button button-secondary">' . esc_html__('Register URLs with Safaricom', 'woocommerce-mpesa-express') . '</a> ' .
+							esc_html__('(requires Consumer Key/Secret and shortcode above to be saved first). If registration fails, add the URLs manually in the Daraja portal.', 'woocommerce-mpesa-express')
+						: esc_html__('Registering these URLs from this site is turned off (WC_MPESA_ALLOW_REGISTER_URLS is not true in wp-config.php), because registering would replace the C2B URLs another system already uses for this PayBill.', 'woocommerce-mpesa-express')
 				),
 			),
 		);
@@ -173,7 +182,7 @@ class WC_Gateway_Mpesa_C2B extends WC_Payment_Gateway {
 
 	private function get_instructions_html(WC_Order $order): string {
 		$template    = (string) $this->get_option('instructions');
-		$shortcode   = trim((string) $this->get_option('business_shortcode'));
+		$shortcode   = $this->credential('business_shortcode');
 		$account_ref = (string) $order->get_meta(self::META_ACCOUNT_REF);
 		if ($account_ref === '') $account_ref = $this->account_reference_for_order($order);
 		$amount = number_format($this->convert_to_kes((float) $order->get_total()), 2);
@@ -194,7 +203,7 @@ class WC_Gateway_Mpesa_C2B extends WC_Payment_Gateway {
 			return array('result' => 'fail');
 		}
 
-		if (trim((string) $this->get_option('business_shortcode')) === '') {
+		if ($this->credential('business_shortcode') === '') {
 			wc_add_notice(__('Payment error: PayBill shortcode is not configured.', 'woocommerce-mpesa-express'), 'error');
 			return array('result' => 'fail');
 		}
@@ -253,7 +262,7 @@ class WC_Gateway_Mpesa_C2B extends WC_Payment_Gateway {
 			return false;
 		}
 
-		$shortcode = trim((string) $this->get_option('business_shortcode'));
+		$shortcode = $this->credential('business_shortcode');
 		if ($shortcode === '') {
 			$this->log('C2B URL registration failed: no shortcode configured.', 'error');
 			return false;
