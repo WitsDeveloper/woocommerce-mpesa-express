@@ -6,7 +6,7 @@ Tested up to: 6.7
 Requires PHP: 7.4
 WC requires at least: 8.0
 WC tested up to: 9.4
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -113,6 +113,9 @@ Yes. Set **Exchange Rate to KES** in the gateway settings; the order total is mu
 Yes, set **Environment** to `Sandbox` and use your Daraja sandbox app credentials and test shortcode/MSISDN provided by Safaricom.
 
 == Changelog ==
+
+= 2.1.1 =
+* No "Order on hold" email to the customer while an STK payment is pending.
 
 = 2.1.0 =
 * STK Push: account reference is a configurable prefix + order number (default RES1024); amount paid is checked against the order total; Safaricom 01xx numbers accepted.

@@ -3,7 +3,7 @@
 /**
  * Plugin Name: WooCommerce Mpesa Express
  * Description: WooCommerce payment gateway for Safaricom M-Pesa — M-Pesa Express (STK Push) and PayBill (manual / C2B), with IPN callback handling.
- * Version: 2.1.0
+ * Version: 2.1.1
  * Requires at least: 6.6
  * Requires PHP: 7.4
  * Author: Sammy Waweru
@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) exit;
 
 define('WC_MPESA_EXPRESS_FILE', __FILE__);
 define('WC_MPESA_EXPRESS_DIR', plugin_dir_path(__FILE__));
-define('WC_MPESA_EXPRESS_VERSION', '2.1.0');
+define('WC_MPESA_EXPRESS_VERSION', '2.1.1');
 
 /**
  * Plugin-wide helpers that don't depend on WooCommerce being loaded yet.
@@ -92,6 +92,15 @@ add_action('plugins_loaded', function () {
 		return $methods;
 	});
 }, 11);
+
+/**
+ * No "Order on hold" email to the customer for STK orders: On hold only means "waiting for the
+ * phone prompt", the waiting screen says so, and the paid email follows seconds later. Staff
+ * still get New order; a short payment stays On hold with an order note for review.
+ */
+add_filter('woocommerce_email_enabled_customer_on_hold_order', function ($enabled, $order) {
+	return ($order instanceof WC_Order && $order->get_payment_method() === 'mpesa_express') ? false : $enabled;
+}, 10, 2);
 
 /**
  * The STK gateway instance (loaded by WooCommerce).
